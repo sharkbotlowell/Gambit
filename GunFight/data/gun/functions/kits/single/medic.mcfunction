@@ -1,0 +1,2 @@
+give @s[tag=medic] scalinghealth:medkit 16
+give @s[tag=medic] tacz:modern_kinetic_gun{AttachmentEXTENDED_MAG:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:light_extended_mag_3"}},AttachmentGRIP:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:grip_vertical_ranger"}},AttachmentLASER:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:laser_compact"}},AttachmentMUZZLE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:muzzle_brake_cthulhu"}},GunCurrentAmmoCount:48,GunFireMode:"AUTO",GunId:"tacz:ump45",HasBulletInBarrel:1b} 1

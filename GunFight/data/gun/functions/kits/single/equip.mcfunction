@@ -1,0 +1,12 @@
+function gun:kits/single/fal
+function gun:kits/single/medic
+function gun:kits/single/smg
+function gun:kits/single/rpk
+function gun:kits/single/snipe
+function gun:kits/single/marksman
+function gun:kits/single/breacher
+function gun:kits/single/smg2
+function gun:kits/single/assault
+function gun:kits/single/sniper
+function gun:kits/single/ranger
+function gun:kits/single/burst
