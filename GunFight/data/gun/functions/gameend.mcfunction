@@ -1,0 +1,15 @@
+revive @a
+tp @a[tag=Red] -7.84 0.00 0.52 -1529.49 1.46
+tp @a[tag=Blue] 6.74 0.00 0.54 -1349.64 2.36
+execute at @a[gamemode=spectator] as @a[gamemode=spectator] run gamemode adventure
+execute as @a[tag=Red] run clear @s
+execute as @a[tag=Blue] run clear @s
+tellraw @a "[Lowell] Game Ending"
+tag @a remove Blue
+tag @a remove Red
+effect give @a regeneration 60 4 true
+effect give @a saturation 1800 0 true
+team join lobby @a[team=red]
+team join lobby @a[team=blue]
+schedule function gun:selectors/loop 1t
+schedule function gun:pleft/close 1t

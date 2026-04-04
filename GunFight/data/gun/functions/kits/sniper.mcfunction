@@ -1,0 +1,4 @@
+give @a[tag=sniper] tacz:modern_kinetic_gun{AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_standard_8x",ZoomNumber:9}},GunCurrentAmmoCount:5,GunFireMode:"SEMI",GunId:"tacz:ai_awp",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Decree","italic":false}'}} 1
+give @a[tag=sniper] tacz:modern_kinetic_gun{AttachmentMUZZLE:{Count:0b,id:"minecraft:air"},GunCurrentAmmoCount:8,GunFireMode:"SEMI",GunId:"tacz:deagle_golden",HasBulletInBarrel:1b,display:{Name:'{"text":"Heirloom","italic":false}'}} 1
+give @a[tag=sniper] marbledsfirstaid:panacea_pills{Damage:0} 1
+give @a[tag=sniper] marbledsfirstaid:panacea_pills{Damage:0} 1
