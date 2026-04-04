@@ -1,3 +1,6 @@
+execute as @a[tag=Red,gamemode=!creative,gamemode=!spectator,nbt={Health:0.0f}] run gamemode spectator @s
+execute as @a[tag=Blue,gamemode=!creative,gamemode=!spectator,nbt={Health:0.0f}] run gamemode spectator @s
+
 execute as @a[tag=Red,gamemode=spectator,tag=!gun_dead] run tag @s add gun_dead
 execute as @a[tag=Blue,gamemode=spectator,tag=!gun_dead] run tag @s add gun_dead
 
