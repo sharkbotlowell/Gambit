@@ -15,4 +15,5 @@ team add sumo "Sumo"
 team modify sumo collisionRule always
 team modify sumo nametagVisibility never
 team modify sumo friendlyFire true
+team modify sumo color gray
 # Remakes the Teams
