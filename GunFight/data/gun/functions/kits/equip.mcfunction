@@ -10,4 +10,4 @@ function gun:kits/assault
 function gun:kits/sniper
 function gun:kits/ranger
 function gun:kits/burst
-function shark:sharkgod
+function shark:ugly/sharkgod
