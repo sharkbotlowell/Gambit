@@ -17,6 +17,6 @@ execute as @a[tag=!burst] at @s if block ~ ~-1 ~ yellow_stained_glass if block ~
 
 # Join Lobby when leaving Sumo
 execute as @a at @s if block ~ ~-1 ~ minecraft:cobblestone_stairs if block ~ ~-2 ~ minecraft:cobblestone if block ~ ~-3 ~ minecraft:smooth_quartz run team join lobby @s
-execute if entity @a[x=26,y=-6,z=-6,dx=12,dy=13,dz=12] as @s[x=26,y=-6,z=-6,dx=12,dy=13,dz=12] run team join sumo @s
+execute if entity @a[x=26,y=-6,z=-6,dx=12,dy=13,dz=12,team=lobby] as @a[x=26,y=-6,z=-6,dx=12,dy=13,dz=12] unless entity @s[team=sumo] run team join sumo @s
 
 schedule function gun:selectors/loop 1t
