@@ -1,5 +1,6 @@
 effect clear @a[gamemode=!creative,gamemode=!spectator]
 clear @a[gamemode=!creative,gamemode=!spectator]
+gamerule doImmediateRespawn true
 tag @a remove gun_dead
 scoreboard players set @a tdm_respawn_timer 0
 function gun:armor
@@ -13,6 +14,7 @@ schedule function gun:death/loop 1t
 
 effect clear @a[gamemode=!creative,gamemode=!spectator]
 clear @a[gamemode=!creative,gamemode=!spectator]
+gamerule doImmediateRespawn true
 function shark:ugly/armor
 function gun:kits/equip
 function gun:countdown/start
