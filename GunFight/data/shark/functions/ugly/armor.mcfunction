@@ -1,6 +1,5 @@
 # Gives Players Armor based on their team, and gives binoculars and ammo.
 
-
 item replace entity @a[tag=Blue,gamemode=!creative,gamemode=!spectator] armor.head with marbledsarsenal:winter_military_armor_helmet
 item replace entity @a[tag=Blue,gamemode=!creative,gamemode=!spectator] armor.chest with marbledsarsenal:winter_military_armor_chestplate
 item replace entity @a[tag=Blue,gamemode=!creative,gamemode=!spectator] armor.legs with marbledsarsenal:winter_military_armor_leggings
