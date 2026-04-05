@@ -4,6 +4,7 @@ tp @a[tag=Blue] 6.74 0.00 0.54 -1349.64 2.36
 gamerule doImmediateRespawn false
 execute at @a[gamemode=spectator] as @a[gamemode=spectator] run gamemode adventure
 tag @a remove gun_dead
+tag @a remove gun_just_died
 execute as @a[tag=Red] run clear @s
 execute as @a[tag=Blue] run clear @s
 tellraw @a "[Lowell] Game Ending"
