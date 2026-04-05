@@ -8,6 +8,7 @@ scoreboard objectives add tdm_red_kills dummy
 scoreboard objectives add tdm_blue_kills dummy
 scoreboard objectives add tdm_kill_target dummy "Kill Target"
 scoreboard objectives add tdm_respawn_timer dummy
+scoreboard objectives add spec_respawn_timer dummy
 scoreboard objectives add tdm_kills dummy "TDM Kills"
 scoreboard objectives add tdm_deaths_counted dummy
 scoreboard objectives add gun_deaths deathCount

@@ -5,6 +5,8 @@ gamerule doImmediateRespawn false
 execute at @a[gamemode=spectator] as @a[gamemode=spectator] run gamemode adventure
 tag @a remove gun_dead
 tag @a remove gun_just_died
+tag @a remove gun_spec_tp_pending
+scoreboard players set @a spec_respawn_timer 0
 execute as @a[tag=Red] run clear @s
 execute as @a[tag=Blue] run clear @s
 tellraw @a "[Lowell] Game Ending"

@@ -8,6 +8,7 @@ scoreboard objectives remove tdm_red_kills
 scoreboard objectives remove tdm_blue_kills
 scoreboard objectives remove tdm_kill_target
 scoreboard objectives remove tdm_respawn_timer
+scoreboard objectives remove spec_respawn_timer
 scoreboard objectives remove tdm_kills
 scoreboard objectives remove tdm_deaths_counted
 scoreboard objectives remove gun_deaths
