@@ -13,4 +13,3 @@ item replace entity @a[gamemode=!creative,gamemode=!spectator] inventory.26 with
 item replace entity @a[gamemode=!creative,gamemode=!spectator] inventory.25 with tacz:ammo_box{AllTypeCreative:1b}
 clear @a[tag=medic] marbledsarsenal:desert_military_armor_helmet
 clear @a[tag=medic] marbledsarsenal:winter_military_armor_helmet
-gamerule falldamage true
