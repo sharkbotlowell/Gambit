@@ -1,3 +1,3 @@
-give @a[tag=marksman] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:0b,id:"minecraft:air"},AttachmentMUZZLE:{Count:0b,id:"minecraft:air"},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_elcan_4x",ZoomNumber:8}},AttachmentSTOCK:{Count:0b,id:"minecraft:air"},GunCurrentAmmoCount:15,GunFireMode:"SEMI",GunId:"tacz:sks_tactical",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Vigil","italic":false}'}} 1
-give @a[tag=marksman] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @a[tag=marksman] marbledsfirstaid:panacea_pills{Damage:0} 1
+give @a[tag=marksman,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:0b,id:"minecraft:air"},AttachmentMUZZLE:{Count:0b,id:"minecraft:air"},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_elcan_4x",ZoomNumber:8}},AttachmentSTOCK:{Count:0b,id:"minecraft:air"},GunCurrentAmmoCount:15,GunFireMode:"SEMI",GunId:"tacz:sks_tactical",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Vigil","italic":false}'}} 1
+give @a[tag=marksman,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
+give @a[tag=marksman,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
