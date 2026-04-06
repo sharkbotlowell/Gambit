@@ -10,4 +10,5 @@ tag @s[tag=assault] remove sniper
 tag @s[tag=assault] remove medic
 tag @s[tag=assault] remove fal
 tag @s[tag=assault] remove rpk
-tellraw @s[tag=assault] ["[Lowell] You Selected the kit, ",{"text":"Assault","color":"red"}]
+title @s actionbar [{"text":"Assault Kit Selected","color":"red"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

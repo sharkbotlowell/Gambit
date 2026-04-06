@@ -10,4 +10,5 @@ tag @s[tag=smg] remove assault
 tag @s[tag=smg] remove sniper
 tag @s[tag=smg] remove ranger
 tag @s[tag=smg] remove burst
-tellraw @s[tag=smg] ["[Lowell] You Selected the kit, ",{"text":"SMG","color":"blue"}]
+title @s actionbar [{"text":"SMG Kit Selected","color":"blue"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

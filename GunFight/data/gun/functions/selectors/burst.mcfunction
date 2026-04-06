@@ -10,4 +10,5 @@ tag @s[tag=burst] remove medic
 tag @s[tag=burst] remove fal 
 tag @s[tag=burst] remove rpk
 tag @s[tag=burst] remove sniper
-tellraw @s[tag=burst] ["[Lowell] You Selected the kit, ",{"text":"Burst","color":"yellow"}]
+title @s actionbar [{"text":"Burst Kit Selected","color":"yellow"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

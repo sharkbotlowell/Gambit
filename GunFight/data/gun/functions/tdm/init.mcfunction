@@ -7,6 +7,8 @@ scoreboard players set Blue tdm_kills 0
 execute unless score #target tdm_kill_target matches 1.. run scoreboard players set #target tdm_kill_target 50
 scoreboard players set @a tdm_respawn_timer 0
 scoreboard players set @a spec_respawn_timer 0
+schedule clear gun:tdm/spawnpoints
+function gun:tdm/spawnpoints
 tag @a remove gun_dead
 tag @a remove gun_just_died
 tag @a remove gun_spec_tp_pending

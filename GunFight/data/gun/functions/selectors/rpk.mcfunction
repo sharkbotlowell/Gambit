@@ -10,4 +10,5 @@ tag @s[tag=rpk] remove assault
 tag @s[tag=rpk] remove sniper
 tag @s[tag=rpk] remove ranger
 tag @s[tag=rpk] remove burst
-tellraw @s[tag=rpk] ["[Lowell] You Selected the kit, ",{"text":"Rifler RPK","color":"dark_red"}]
+title @s actionbar [{"text":"Rifler RPK Kit Selected","color":"dark_red"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

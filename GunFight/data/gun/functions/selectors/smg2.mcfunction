@@ -10,4 +10,5 @@ tag @s[tag=smg2] remove fal
 tag @s[tag=smg2] remove rpk
 tag @s[tag=smg2] remove sniper
 tag @s[tag=smg2] remove smg
-tellraw @s[tag=smg2] ["[Lowell] You Selected the kit, ",{"text":"Flanker","color":"aqua"}]
+title @s actionbar [{"text":"Flanker Kit Selected","color":"aqua"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

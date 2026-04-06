@@ -10,4 +10,5 @@ tag @s[tag=fal] remove assault
 tag @s[tag=fal] remove sniper
 tag @s[tag=fal] remove ranger
 tag @s[tag=fal] remove burst
-tellraw @s[tag=fal] ["[Lowell] You Selected the kit, ",{"text":"Rifler FAL","color":"gold"}]
+title @s actionbar [{"text":"Rifler FAL Kit Selected","color":"gold"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

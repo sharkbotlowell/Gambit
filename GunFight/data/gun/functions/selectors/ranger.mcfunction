@@ -10,4 +10,5 @@ tag @s[tag=ranger] remove medic
 tag @s[tag=ranger] remove fal
 tag @s[tag=ranger] remove rpk
 tag @s[tag=ranger] remove sniper
-tellraw @s[tag=ranger] ["[Lowell] You Selected the kit, ",{"text":"Ranger","color":"green"}]
+title @s actionbar [{"text":"Ranger Kit Selected","color":"green"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

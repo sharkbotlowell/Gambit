@@ -8,6 +8,7 @@ item replace entity @s[tag=Red,gamemode=!creative,gamemode=!spectator] armor.leg
 item replace entity @s[tag=Red,gamemode=!creative,gamemode=!spectator] armor.feet with marbledsarsenal:desert_military_armor_boots
 item replace entity @s[gamemode=!creative,gamemode=!spectator] inventory.26 with binocularsmod:binoculars
 item replace entity @s[gamemode=!creative,gamemode=!spectator] inventory.25 with tacz:ammo_box{AllTypeCreative:1b}
+give @s[gamemode=!creative,gamemode=!spectator] minecraft:cooked_beef 16
 clear @s[tag=medic] marbledsarsenal:desert_military_armor_helmet
 clear @s[tag=medic] marbledsarsenal:winter_military_armor_helmet
 function gun:kits/single/equip

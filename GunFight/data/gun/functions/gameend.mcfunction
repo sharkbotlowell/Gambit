@@ -16,5 +16,6 @@ effect give @a regeneration 60 4 true
 effect give @a saturation 1800 0 true
 team join lobby @a[team=red]
 team join lobby @a[team=blue]
+schedule clear gun:tdm/spawnpoints
 schedule function gun:selectors/loop 1t
 schedule function gun:pleft/close 1t

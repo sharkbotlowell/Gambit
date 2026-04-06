@@ -10,4 +10,5 @@ tag @s[tag=breacher] remove medic
 tag @s[tag=breacher] remove fal
 tag @s[tag=breacher] remove rpk
 tag @s[tag=breacher] remove sniper
-tellraw @s[tag=breacher] ["[Lowell] You Selected the kit, ",{"text":"Breacher","color":"gold"}]
+title @s actionbar [{"text":"Breacher Kit Selected","color":"gold"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

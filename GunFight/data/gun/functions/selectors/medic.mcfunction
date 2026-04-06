@@ -10,4 +10,5 @@ tag @s[tag=medic] remove assault
 tag @s[tag=medic] remove sniper
 tag @s[tag=medic] remove ranger
 tag @s[tag=medic] remove burst
-tellraw @s[tag=medic] ["[Lowell] You Selected the kit, ",{"text":"Medic","color":"red"}]
+title @s actionbar [{"text":"Medic Kit Selected","color":"red"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

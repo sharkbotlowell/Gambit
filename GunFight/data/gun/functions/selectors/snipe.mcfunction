@@ -10,4 +10,5 @@ tag @s[tag=snipe] remove assault
 tag @s[tag=snipe] remove sniper
 tag @s[tag=snipe] remove ranger
 tag @s[tag=snipe] remove burst
-tellraw @s[tag=snipe] ["[Lowell] You Selected the kit, ",{"text":"Sniper","color":"green"}]
+title @s actionbar [{"text":"Sniper Kit Selected","color":"green"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

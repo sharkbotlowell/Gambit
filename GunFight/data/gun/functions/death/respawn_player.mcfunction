@@ -1,5 +1,5 @@
-gamemode adventure @s
 clear @s
+gamemode adventure @s
 function gun:death/loadout_self
 
 execute if score #map map_id matches 1 if entity @s[tag=Red] run tp @s 303.63 38.00 -38.84 -58.03 9.75
@@ -10,6 +10,10 @@ execute if score #map map_id matches 3 if entity @s[tag=Red] run tp @s 110.49 15
 execute if score #map map_id matches 3 if entity @s[tag=Blue] run tp @s -4.60 16.00 -177.36 227.61 -1.39
 execute if score #map map_id matches 99 if entity @s[tag=Red] run tp @s 1000.00 64.00 1000.00 180.00 0.00
 execute if score #map map_id matches 99 if entity @s[tag=Blue] run tp @s 1020.00 64.00 1020.00 0.00 0.00
+
+title @s actionbar {"text":""}
+effect give @s minecraft:blindness 1 0 true
+execute at @s run playsound minecraft:block.respawn_anchor.set_spawn master @s ~ ~ ~ 0.9 1.0
 
 scoreboard players set @s tdm_respawn_timer 0
 tag @s remove gun_dead

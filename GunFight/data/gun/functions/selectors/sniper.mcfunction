@@ -10,4 +10,5 @@ tag @s[tag=sniper] remove medic
 tag @s[tag=sniper] remove fal
 tag @s[tag=sniper] remove snipe
 tag @s[tag=sniper] remove rpk
-tellraw @s[tag=sniper] ["[Lowell] You Selected the kit, ",{"text":"Sniper","color":"dark_purple"}]
+title @s actionbar [{"text":"Sniper Kit Selected","color":"dark_purple"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2

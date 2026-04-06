@@ -10,4 +10,5 @@ tag @s[tag=marksman] remove medic
 tag @s[tag=marksman] remove fal
 tag @s[tag=marksman] remove rpk
 tag @s[tag=marksman] remove sniper
-tellraw @s[tag=marksman] ["[Lowell] You Selected the kit, ",{"text":"Marksman","color":"blue"}]
+title @s actionbar [{"text":"Marksman Kit Selected","color":"blue"}]
+playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.6 1.2
