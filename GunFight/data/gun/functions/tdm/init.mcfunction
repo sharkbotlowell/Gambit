@@ -4,6 +4,8 @@ scoreboard players set #Red tdm_red_kills 0
 scoreboard players set #Blue tdm_blue_kills 0
 scoreboard players set Red tdm_kills 0
 scoreboard players set Blue tdm_kills 0
+scoreboard players set #RedWarn tdm_ui 0
+scoreboard players set #BlueWarn tdm_ui 0
 execute unless score #target tdm_kill_target matches 1.. run scoreboard players set #target tdm_kill_target 50
 scoreboard players set @a tdm_respawn_timer 0
 scoreboard players set @a spec_respawn_timer 0
