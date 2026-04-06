@@ -11,6 +11,7 @@ execute as @a[gamemode=!creative] run scoreboard players operation @s tdm_deaths
 function gun:armor
 function gun:kits/equip
 execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
+execute if score #mode mode_respawns matches 1 run function gun:tdm/objective_announce
 function gun:countdown/start
 team join red @a[tag=Red]
 team join blue @a[tag=Blue]
@@ -24,6 +25,7 @@ gamerule doImmediateRespawn true
 function shark:ugly/armor
 function gun:kits/equip
 execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
+execute if score #mode mode_respawns matches 1 run function gun:tdm/objective_announce
 function gun:countdown/start
 team join red @a[tag=Red]
 team join blue @a[tag=Blue]
