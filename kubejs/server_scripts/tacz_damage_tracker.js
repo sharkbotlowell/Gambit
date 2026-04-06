@@ -305,7 +305,7 @@ function applyMatchResult(server, targetArg, addMatch, addWin) {
 }
 
 function formatEntry(name, e) {
-  return '§e' + name + '§r — §cavg dmg/life: §f' + getAvgDamagePerLife(e).toFixed(1)
+  return '§e' + name + '§r — §cDamage per Life: §f' + getAvgDamagePerLife(e).toFixed(1)
     + '§r | §bKD: §f' + getKD(e).toFixed(2);
 }
 
@@ -639,7 +639,7 @@ ServerEvents.commandRegistry(function(event) {
             var e = getEntry(name);
 
             player.tell('§6§l── Gambit Stats: ' + name + ' ──');
-            player.tell('  §cDamage dealt: §f' + e.damage.toFixed(2));
+            player.tell('  §cDamage per Life: §f' + getAvgDamagePerLife(e).toFixed(2));
             player.tell('  §4Kills: §f' + e.kills);
             player.tell('  §8Deaths: §f' + e.deaths);
             player.tell('  §bKD: §f' + getKD(e).toFixed(2));
