@@ -10,6 +10,7 @@ execute as @a[gamemode=!creative] run scoreboard players operation @s gun_deaths
 execute as @a[gamemode=!creative] run scoreboard players operation @s tdm_deaths_counted = @s gun_deaths
 function gun:armor
 function gun:kits/equip
+execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
 function gun:countdown/start
 team join red @a[tag=Red]
 team join blue @a[tag=Blue]
@@ -22,6 +23,7 @@ clear @a[gamemode=!creative,gamemode=!spectator]
 gamerule doImmediateRespawn true
 function shark:ugly/armor
 function gun:kits/equip
+execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
 function gun:countdown/start
 team join red @a[tag=Red]
 team join blue @a[tag=Blue]
