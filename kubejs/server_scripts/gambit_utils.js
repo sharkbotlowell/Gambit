@@ -1,5 +1,5 @@
 // ============================================================
-// Gambit Queue Commands
+// Gambit Utility Commands
 //
 //   /spectate      - Opt out of queue immediately.
 //                    If currently in a match, switch to spectator and teleport
@@ -11,12 +11,20 @@
 //
 //   /queue         - Show current queue status.
 //
+//   /setgoal <n>   - Set the TDM kill target (OP only, 1–500).
+//                    Broadcasts the new target to all players.
+//
+//   /setmap <preset> - Announce and stage the next map (OP only).
+//                    Presets: forest, forest2, trenches, tdm_forest
+//                    Displays persistently in the lobby actionbar.
+//
 // Notes:
 //   - Queue state is controlled by player tag: gun_optout
 //   - Opted-out players are excluded from round-start team assignment.
 // ============================================================
 
 var OPT_OUT_TAG = 'gun_optout';
+var IntegerArgumentType = Java.loadClass('com.mojang.brigadier.arguments.IntegerArgumentType');
 
 function hasTagSafe(player, tagName) {
   if (!player || !tagName) return false;
@@ -89,6 +97,26 @@ function tellQueueStatus(player) {
   player.tell('§7Use §f/spectate §7to opt out.');
 }
 
+function announceNextMap(server, mapId, modeId, modeName, mapName, modeColor, bossbarColor) {
+  server.runCommandSilent('scoreboard players set #nextmap nextmap_id ' + mapId);
+  server.runCommandSilent('scoreboard players set #nextmode nextmap_mode ' + modeId);
+  server.runCommandSilent(
+    'bossbar set gun:nextmap name ["",{"text":"Next Map: ","color":"gold"},{"text":"' + modeName + '","color":"' + modeColor + '"},{"text":" \u2014 ' + mapName + '","color":"white"}]'
+  );
+  server.runCommandSilent('bossbar set gun:nextmap color ' + bossbarColor);
+  server.runCommandSilent('bossbar set gun:nextmap players @a');
+  server.runCommandSilent('bossbar set gun:nextmap visible true');
+}
+
+ServerEvents.loaded(function(event) {
+  event.server.runCommandSilent('scoreboard objectives add nextmap_id dummy');
+  event.server.runCommandSilent('scoreboard objectives add nextmap_mode dummy');
+  event.server.runCommandSilent('bossbar add gun:nextmap {"text":""}');
+  event.server.runCommandSilent('bossbar set gun:nextmap visible false');
+  event.server.runCommandSilent('bossbar set gun:nextmap max 1');
+  event.server.runCommandSilent('bossbar set gun:nextmap value 1');
+});
+
 ServerEvents.commandRegistry(function(event) {
   var Commands = event.commands;
 
@@ -132,6 +160,56 @@ ServerEvents.commandRegistry(function(event) {
         var player = ctx.source.player;
         if (!player || !player.tell) return 1;
         tellQueueStatus(player);
+        return 1;
+      })
+  );
+
+  event.register(
+    Commands.literal('setgoal')
+      .requires(function(src) { return src.hasPermission(2); })
+      .then(
+        Commands.argument('kills', IntegerArgumentType.integer(1, 500))
+          .executes(function(ctx) {
+            var kills = IntegerArgumentType.getInteger(ctx, 'kills');
+            ctx.source.server.runCommandSilent('scoreboard players set #target tdm_kill_target ' + kills);
+            ctx.source.server.runCommandSilent(
+              'tellraw @a ["[Gambit] ",{"text":"TDM kill target set to ","color":"yellow"},{"text":"' + kills + '","color":"aqua"},{"text":" kills.","color":"yellow"}]'
+            );
+            return 1;
+          })
+      )
+  );
+
+  event.register(
+    Commands.literal('setmap')
+      .requires(function(src) { return src.hasPermission(2); })
+      .then(Commands.literal('forest')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 1, 0, 'Elimination', 'Forest', 'green', 'green');
+          return 1;
+        }))
+      .then(Commands.literal('forest2')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 2, 0, 'Elimination', 'Forest 2', 'green', 'green');
+          return 1;
+        }))
+      .then(Commands.literal('trenches')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 3, 0, 'Elimination', 'Trenches', 'green', 'green');
+          return 1;
+        }))
+      .then(Commands.literal('tdm_forest')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 1, 1, 'TDM', 'Forest', 'aqua', 'blue');
+          return 1;
+        }))
+  );
+
+  event.register(
+    Commands.literal('start')
+      .requires(function(src) { return src.hasPermission(2); })
+      .executes(function(ctx) {
+        ctx.source.server.runCommandSilent('function gun:starts/staged');
         return 1;
       })
   );

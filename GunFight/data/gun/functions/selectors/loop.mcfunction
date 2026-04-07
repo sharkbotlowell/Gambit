@@ -13,6 +13,12 @@ execute as @a[tag=!sniper] at @s if block ~ ~-1 ~ purple_stained_glass if block 
 execute as @a[tag=!ranger] at @s if block ~ ~-1 ~ lime_stained_glass if block ~ ~-2 ~ verdant_froglight if block ~ ~-3 ~ dried_kelp_block run function gun:selectors/ranger
 execute as @a[tag=!burst] at @s if block ~ ~-1 ~ yellow_stained_glass if block ~ ~-2 ~ glowstone if block ~ ~-3 ~ dried_kelp_block run function gun:selectors/burst
 
+# Next Map Lobby Display
+execute if score #nextmap nextmap_id matches 1 unless score #nextmode nextmap_mode matches 1 as @a[tag=!gun_optout,gamemode=!creative,gamemode=!spectator] run title @s actionbar [{"text":"Next Map: ","color":"gold"},{"text":"Elimination","color":"green"},{"text":" \u2014 Forest","color":"white"}]
+execute if score #nextmap nextmap_id matches 1 if score #nextmode nextmap_mode matches 1 as @a[tag=!gun_optout,gamemode=!creative,gamemode=!spectator] run title @s actionbar [{"text":"Next Map: ","color":"gold"},{"text":"TDM","color":"aqua"},{"text":" \u2014 Forest","color":"white"}]
+execute if score #nextmap nextmap_id matches 2 as @a[tag=!gun_optout,gamemode=!creative,gamemode=!spectator] run title @s actionbar [{"text":"Next Map: ","color":"gold"},{"text":"Elimination","color":"green"},{"text":" \u2014 Forest 2","color":"white"}]
+execute if score #nextmap nextmap_id matches 3 as @a[tag=!gun_optout,gamemode=!creative,gamemode=!spectator] run title @s actionbar [{"text":"Next Map: ","color":"gold"},{"text":"Elimination","color":"green"},{"text":" \u2014 Trenches","color":"white"}]
+
 # Team Selectors
 
 execute as @a[tag=gun_optout] run title @s actionbar [{"text":"Spectate Mode","color":"yellow","bold":true},{"text":" - use ","color":"gray"},{"text":"/play","color":"green"},{"text":" to queue","color":"gray"}]
