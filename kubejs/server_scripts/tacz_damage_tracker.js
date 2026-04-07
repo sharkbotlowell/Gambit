@@ -68,17 +68,20 @@ function markStatsDirty() {
 }
 
 function loadStatsFromDisk() {
-  stats = {};
   try {
     var parsed = JsonIO.read(STATS_FILE_PATH);
-    if (!parsed) return;
+    if (!parsed) return false;
 
-    var keys = Object.keys(parsed || {});
+    var loaded = {};
+    var keys = Object.keys(parsed);
     for (var i = 0; i < keys.length; i++) {
-      stats[keys[i]] = normalizeEntry(parsed[keys[i]]);
+      loaded[keys[i]] = normalizeEntry(parsed[keys[i]]);
     }
+    stats = loaded;
+    return true;
   } catch (e) {
     console.error('[Gambit Stats] Failed to load stats file: ' + e);
+    return false;
   }
 }
 
@@ -307,6 +310,14 @@ function getWinPct(e) {
 function getAvgDamagePerLife(e) {
   if (!e) return 0;
   return e.damage / Math.max(1, e.deaths);
+}
+
+// Combined leaderboard score: rewards players who are strong in both KD and
+// damage output. Neither metric alone is sufficient — this penalises stat-padding
+// in either direction.
+function getCompositeScore(e) {
+  if (!e) return 0;
+  return getKD(e) * getAvgDamagePerLife(e);
 }
 
 function getOnlinePlayerByName(server, playerName) {
@@ -595,6 +606,9 @@ function getSortedEntries() {
     arr.push([keys[i], stats[keys[i]]]);
   }
   arr.sort(function(a, b) {
+    var scoreDiff = getCompositeScore(b[1]) - getCompositeScore(a[1]);
+    if (scoreDiff !== 0) return scoreDiff;
+    // Tiebreaker: higher KD wins; then higher raw damage.
     var kdDiff = getKD(b[1]) - getKD(a[1]);
     if (kdDiff !== 0) return kdDiff;
     return b[1].damage - a[1].damage;
@@ -607,9 +621,11 @@ function statsSize() {
 }
 
 ServerEvents.loaded(function(event) {
-  loadStatsFromDisk();
+  var loaded = loadStatsFromDisk();
   loadOnlinePlayersIntoStats(event.server);
-  saveStatsToDisk();
+  if (loaded) {
+    saveStatsToDisk();
+  }
 });
 
 PlayerEvents.loggedIn(function(event) {
