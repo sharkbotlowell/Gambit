@@ -25,13 +25,73 @@ var PD_WINS = 'gambit_stats_wins';
 var PD_MVPS = 'gambit_stats_mvps';
 var LAST_TACZ_ATTACK_TTL_MS = 15000;
 var ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS = 200;
+var STATS_FLUSH_INTERVAL_TICKS = 200;
 var PLAYERREVIVE_BLEEDING_KEY = 'playerrevive:bleeding';
+var STATS_FILE_PATH = 'kubejs/data/gambit_stats.json';
 
 // ── In-memory stat store ─────────────────────────────────────
 var stats = {};
 var roundStats = {};
 var recentPlayerAttackers = {};
+var recentDownedFinishers = {};
 var attackerCacheCleanupTicker = 0;
+var statsSaveTicker = 0;
+var statsDirty = false;
+
+function makeDefaultEntry() {
+  return { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
+}
+
+function normalizeEntry(raw) {
+  var base = makeDefaultEntry();
+  if (!raw) return base;
+
+  base.damage = Number(raw.damage || 0.0);
+  base.kills = Math.floor(Number(raw.kills || 0));
+  base.deaths = Math.floor(Number(raw.deaths || 0));
+  base.matches = Math.floor(Number(raw.matches || 0));
+  base.wins = Math.floor(Number(raw.wins || 0));
+  base.mvps = Math.floor(Number(raw.mvps || 0));
+
+  if (Number.isNaN(base.damage)) base.damage = 0.0;
+  if (Number.isNaN(base.kills)) base.kills = 0;
+  if (Number.isNaN(base.deaths)) base.deaths = 0;
+  if (Number.isNaN(base.matches)) base.matches = 0;
+  if (Number.isNaN(base.wins)) base.wins = 0;
+  if (Number.isNaN(base.mvps)) base.mvps = 0;
+
+  return base;
+}
+
+function markStatsDirty() {
+  statsDirty = true;
+}
+
+function loadStatsFromDisk() {
+  stats = {};
+  try {
+    var parsed = JsonIO.read(STATS_FILE_PATH);
+    if (!parsed) return;
+
+    var keys = Object.keys(parsed || {});
+    for (var i = 0; i < keys.length; i++) {
+      stats[keys[i]] = normalizeEntry(parsed[keys[i]]);
+    }
+  } catch (e) {
+    console.error('[Gambit Stats] Failed to load stats file: ' + e);
+  }
+}
+
+function saveStatsToDisk() {
+  try {
+    JsonIO.write(STATS_FILE_PATH, stats);
+
+    statsDirty = false;
+    statsSaveTicker = 0;
+  } catch (e) {
+    console.error('[Gambit Stats] Failed to save stats file: ' + e);
+  }
+}
 
 function getPlayerId(player) {
   if (!player) return null;
@@ -67,6 +127,28 @@ function consumeRecentAttackerName(victim) {
   return cached.attackerName || null;
 }
 
+function rememberDownedFinisher(victim, attacker) {
+  var victimId = getPlayerId(victim);
+  var attackerName = attacker && attacker.name && attacker.name.string ? attacker.name.string : null;
+  if (!victimId || !attackerName) return;
+
+  recentDownedFinishers[victimId] = {
+    attackerName: attackerName,
+    expiresAt: Date.now() + LAST_TACZ_ATTACK_TTL_MS
+  };
+}
+
+function consumeDownedFinisherName(victim) {
+  var victimId = getPlayerId(victim);
+  if (!victimId) return null;
+
+  var cached = recentDownedFinishers[victimId];
+  delete recentDownedFinishers[victimId];
+  if (!cached) return null;
+  if (Date.now() > cached.expiresAt) return null;
+  return cached.attackerName || null;
+}
+
 function cleanupExpiredAttackerCache() {
   var now = Date.now();
   var keys = Object.keys(recentPlayerAttackers);
@@ -76,6 +158,15 @@ function cleanupExpiredAttackerCache() {
     var cached = recentPlayerAttackers[key];
     if (!cached || now > cached.expiresAt) {
       delete recentPlayerAttackers[key];
+    }
+  }
+
+  var downedKeys = Object.keys(recentDownedFinishers);
+  for (var j = 0; j < downedKeys.length; j++) {
+    var downedKey = downedKeys[j];
+    var downedCached = recentDownedFinishers[downedKey];
+    if (!downedCached || now > downedCached.expiresAt) {
+      delete recentDownedFinishers[downedKey];
     }
   }
 }
@@ -98,7 +189,7 @@ function isDownedPlayer(player) {
 
 function getEntry(playerName) {
   if (!stats[playerName]) {
-    stats[playerName] = { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
+    stats[playerName] = makeDefaultEntry();
   }
   return stats[playerName];
 }
@@ -184,6 +275,7 @@ function saveEntryToPlayer(player) {
   writeTagNumber(tag, PD_MATCHES, entry.matches, true);
   writeTagNumber(tag, PD_WINS, entry.wins, true);
   writeTagNumber(tag, PD_MVPS, entry.mvps, true);
+  markStatsDirty();
 }
 
 function clearEntryForPlayer(player) {
@@ -191,7 +283,7 @@ function clearEntryForPlayer(player) {
   var name = player.name && player.name.string ? player.name.string : null;
   if (!name) return;
 
-  stats[name] = { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
+  stats[name] = makeDefaultEntry();
   saveEntryToPlayer(player);
 }
 
@@ -389,11 +481,11 @@ function getSortedRoundEntries(metric) {
 }
 
 function formatRoundEntryForKills(name, e) {
-  return '§e' + name + '§r — §4kills: §f' + e.kills;
+  return '§e' + name + '§r — §4Kills: §f' + e.kills;
 }
 
 function formatRoundEntryForDamage(name, e) {
-  return '§e' + name + '§r — §cdmg: §f' + e.damage.toFixed(1);
+  return '§e' + name + '§r — §cDamage: §f' + e.damage.toFixed(1);
 }
 
 function tellAll(server, msg) {
@@ -457,6 +549,7 @@ function awardMvpToLifetime(server, playerName) {
   var resolved = existing || playerName;
   var entry = getEntry(resolved);
   entry.mvps = (entry.mvps || 0) + 1;
+  markStatsDirty();
   return resolved;
 }
 
@@ -487,7 +580,7 @@ function broadcastPostGameScoreboard(server) {
   tellAll(server, '§8§m-----------------------------------');
   if (mvp) {
     var awardedName = awardMvpToLifetime(server, mvp.name);
-    tellAll(server, '§a§lMVP: §e' + awardedName + '§r §7(' + mvp.entry.kills + ' kills, ' + mvp.entry.damage.toFixed(1) + ' dmg)');
+    tellAll(server, '§a§lMVP: §e' + awardedName + '§r §7(' + mvp.entry.kills + ' Kills, ' + mvp.entry.damage.toFixed(1) + ' Damage)');
   }
 
   tellAll(server, '§6§l===================================');
@@ -514,11 +607,23 @@ function statsSize() {
 }
 
 ServerEvents.loaded(function(event) {
+  loadStatsFromDisk();
   loadOnlinePlayersIntoStats(event.server);
+  saveStatsToDisk();
 });
 
 PlayerEvents.loggedIn(function(event) {
-  loadEntryFromPlayer(event.player);
+  var player = event.player;
+  var name = player && player.name && player.name.string ? player.name.string : null;
+  if (!name) return;
+
+  if (stats[name]) {
+    saveEntryToPlayer(player);
+    return;
+  }
+
+  loadEntryFromPlayer(player);
+  markStatsDirty();
 });
 
 ServerEvents.tick(function(event) {
@@ -527,6 +632,11 @@ ServerEvents.tick(function(event) {
 
   attackerCacheCleanupTicker = 0;
   cleanupExpiredAttackerCache();
+
+  statsSaveTicker += ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS;
+  if (statsDirty && statsSaveTicker >= STATS_FLUSH_INTERVAL_TICKS) {
+    saveStatsToDisk();
+  }
 });
 
 // ── Damage event ─────────────────────────────────────────────
@@ -558,6 +668,12 @@ EntityEvents.hurt(function(event) {
   // Track last TACZ attacker for players so kill credit happens once on death.
   if (entity && entity.player) {
     rememberRecentAttacker(entity, player);
+
+    // Cache finisher while target is in downed state; PlayerRevive may clear
+    // the downed flag by the time death event fires.
+    if (isDownedPlayer(entity)) {
+      rememberDownedFinisher(entity, player);
+    }
   }
 
   saveEntryToPlayer(player);
@@ -576,13 +692,15 @@ EntityEvents.death(function(event) {
   entry.deaths += 1;
   saveEntryToPlayer(dead);
 
-  // Only award a kill when the victim was already in a downed state.
-  if (!isDownedPlayer(dead)) {
+  // Prefer finisher credit while downed; if nobody finished and victim bled out,
+  // fall back to the last attacker (the downer) for ownership.
+  var killerName = consumeDownedFinisherName(dead);
+  if (!killerName) {
+    killerName = consumeRecentAttackerName(dead);
+  } else {
     consumeRecentAttackerName(dead);
-    return;
   }
 
-  var killerName = consumeRecentAttackerName(dead);
   if (!killerName || killerName === deadName) return;
 
   var killerPlayer = getOnlinePlayerByName(event.server, killerName);
@@ -592,6 +710,7 @@ EntityEvents.death(function(event) {
   var killerRoundEntry = getRoundEntry(killerName);
   killerEntry.kills += 1;
   killerRoundEntry.kills += 1;
+  markStatsDirty();
 
   if (killerPlayer) saveEntryToPlayer(killerPlayer);
 });
@@ -816,6 +935,7 @@ ServerEvents.commandRegistry(function(event) {
                 ctx.source.server.players.forEach(function(p) {
                   clearEntryForPlayer(p);
                 });
+                saveStatsToDisk();
 
                 if (player && player.tell) player.tell('§a[Gambit Stats] Cleared stats for ' + count + ' player(s).');
                 ctx.source.server.players.forEach(function(p) {
@@ -839,6 +959,7 @@ ServerEvents.commandRegistry(function(event) {
                 }
 
                 clearEntryForPlayer(targetPlayer);
+                saveStatsToDisk();
 
                 if (caller && caller.tell) {
                   caller.tell('§a[Gambit Stats] Reset stats for ' + targetPlayer.name.string + '.');
