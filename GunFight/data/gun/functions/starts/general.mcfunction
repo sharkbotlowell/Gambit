@@ -1,5 +1,5 @@
-effect clear @a[gamemode=!creative,gamemode=!spectator]
-clear @a[gamemode=!creative,gamemode=!spectator]
+effect clear @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout]
+clear @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout]
 gamerule doImmediateRespawn true
 tag @a remove gun_dead
 tag @a remove gun_just_died
@@ -9,22 +9,26 @@ scoreboard players set @a spec_respawn_timer 0
 execute as @a[gamemode=!creative] run scoreboard players operation @s gun_deaths_prev = @s gun_deaths
 execute as @a[gamemode=!creative] run scoreboard players operation @s tdm_deaths_counted = @s gun_deaths
 function gun:armor
-function gun:kits/equip
-execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
+execute as @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout] run function gun:kits/equip
+execute as @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout] run function gun:rations/give_random_self
+execute as @a[tag=gun_optout,gamemode=!creative] run gamemode spectator @s
+execute as @a[tag=gun_optout,gamemode=spectator] run function gun:starts/spectator_tpmap
 function gun:countdown/start
-team join red @a[tag=Red]
-team join blue @a[tag=Blue]
+team join red @a[tag=Red,tag=!gun_optout]
+team join blue @a[tag=Blue,tag=!gun_optout]
 schedule clear gun:selectors/loop
 schedule function gun:death/loop 1t
 
 
-effect clear @a[gamemode=!creative,gamemode=!spectator]
-clear @a[gamemode=!creative,gamemode=!spectator]
+effect clear @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout]
+clear @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout]
 gamerule doImmediateRespawn true
 function shark:ugly/armor
-function gun:kits/equip
-execute as @a[gamemode=!creative,gamemode=!spectator] run function gun:rations/give_random_self
+execute as @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout] run function gun:kits/equip
+execute as @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout] run function gun:rations/give_random_self
+execute as @a[tag=gun_optout,gamemode=!creative] run gamemode spectator @s
+execute as @a[tag=gun_optout,gamemode=spectator] run function gun:starts/spectator_tpmap
 function gun:countdown/start
-team join red @a[tag=Red]
-team join blue @a[tag=Blue]
+team join red @a[tag=Red,tag=!gun_optout]
+team join blue @a[tag=Blue,tag=!gun_optout]
 schedule clear gun:selectors/loop
