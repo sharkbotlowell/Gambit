@@ -1,3 +1,4 @@
 give @a[tag=assault,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:grip_vertical_military"}},AttachmentLASER:{Count:0b,id:"minecraft:air"},AttachmentMUZZLE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:muzzle_brake_cyclone_d2"}},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_acog_ta31",ZoomNumber:1}},GunCurrentAmmoCount:30,GunFireMode:"AUTO",GunId:"tacz:fn_fal",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Conquest","italic":false}'}} 1
 give @a[tag=assault,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
 give @a[tag=assault,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
+give @a[tag=assault,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1

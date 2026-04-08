@@ -2,3 +2,4 @@ give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun
 give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
 give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
 give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:morphine 1
+give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1

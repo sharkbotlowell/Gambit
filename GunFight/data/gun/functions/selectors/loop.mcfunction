@@ -1,10 +1,5 @@
 # Kit Selectors
 
-execute as @a[tag=!medic] at @s if block ~ ~-1 ~ pink_stained_glass if block ~ ~-2 ~ pearlescent_froglight if block ~ ~-3 ~ target run function gun:selectors/medic
-execute as @a[tag=!snipe] at @s if block ~ ~-1 ~ green_stained_glass if block ~ ~-2 ~ verdant_froglight if block ~ ~-3 ~ target run function gun:selectors/snipe
-execute as @a[tag=!fal] at @s if block ~ ~-1 ~ orange_stained_glass if block ~ ~-2 ~ ochre_froglight if block ~ ~-3 ~ target run function gun:selectors/fal
-execute as @a[tag=!smg] at @s if block ~ ~-1 ~ blue_stained_glass if block ~ ~-2 ~ sea_lantern if block ~ ~-3 ~ target run function gun:selectors/smg
-execute as @a[tag=!rpk] at @s if block ~ ~-1 ~ red_stained_glass if block ~ ~-2 ~ shroomlight if block ~ ~-3 ~ target run function gun:selectors/rpk
 execute as @a[tag=!marksman] at @s if block ~ ~-1 ~ blue_stained_glass if block ~ ~-2 ~ sea_lantern if block ~ ~-3 ~ dried_kelp_block run function gun:selectors/marksman
 execute as @a[tag=!breacher] at @s if block ~ ~-1 ~ orange_stained_glass if block ~ ~-2 ~ honeycomb_block if block ~ ~-3 ~ dried_kelp_block run function gun:selectors/breacher
 execute as @a[tag=!smg2] at @s if block ~ ~-1 ~ light_blue_stained_glass if block ~ ~-2 ~ prismarine if block ~ ~-3 ~ dried_kelp_block run function gun:selectors/smg2

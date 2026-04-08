@@ -2,3 +2,4 @@ give @s[tag=smg2] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:1b,id:"tacz:atta
 give @s[tag=smg2] marbledsfirstaid:panacea_pills{Damage:0} 1
 give @s[tag=smg2] marbledsfirstaid:panacea_pills{Damage:0} 1
 give @s[tag=smg2] marbledsfirstaid:morphine 1
+give @s[tag=smg2] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1

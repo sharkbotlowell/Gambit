@@ -1,8 +1,3 @@
-function gun:kits/single/fal
-function gun:kits/single/medic
-function gun:kits/single/smg
-function gun:kits/single/rpk
-function gun:kits/single/snipe
 function gun:kits/single/marksman
 function gun:kits/single/breacher
 function gun:kits/single/smg2
