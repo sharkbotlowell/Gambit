@@ -1,5 +1,0 @@
-give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:grip_rk6"}},AttachmentMUZZLE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:muzzle_brake_cyclone_d2"}},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:sight_coyote"}},AttachmentSTOCK:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:stock_moe"}},GunCurrentAmmoCount:40,GunFireMode:"AUTO",GunId:"tacz:vector45",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Flurry","italic":false}'}} 1
-give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @a[tag=smg2,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:morphine 1
-give @a[tag=snipe,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1

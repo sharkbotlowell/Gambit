@@ -1,4 +1,0 @@
-give @a[tag=burst,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_qmk152"}},GunCurrentAmmoCount:20,GunFireMode:"BURST",GunId:"tacz:qbz_95",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Trident","italic":false}'}} 1
-give @a[tag=burst,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @a[tag=burst,gamemode=!creative,gamemode=!spectator] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @a[tag=fal,gamemode=!creative,gamemode=!spectator] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1

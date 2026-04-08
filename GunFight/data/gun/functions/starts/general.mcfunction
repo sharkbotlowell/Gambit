@@ -8,7 +8,7 @@ scoreboard players set @a tdm_respawn_timer 0
 scoreboard players set @a spec_respawn_timer 0
 execute as @a[gamemode=!creative] run scoreboard players operation @s gun_deaths_prev = @s gun_deaths
 execute as @a[gamemode=!creative] run scoreboard players operation @s tdm_deaths_counted = @s gun_deaths
-function gun:armor
+function shark:ugly/armor
 function gun:kits/equip
 execute as @a[gamemode=!creative,gamemode=!spectator,tag=!gun_optout] run function gun:rations/give_random_self
 execute as @a[tag=gun_optout,gamemode=!creative] run gamemode spectator @s

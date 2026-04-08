@@ -13,6 +13,10 @@
 //    /gambitstats reset <playerName>      — reset one player's stats (ops only, online)
 //    /gambitstats reset all               — reset all players' stats (ops only)
 //    /gambitstats reset                   — shows reset usage/help (ops only)
+//
+//    /gambitboard setup                   — tag the nearest armor stand as the billboard (ops only)
+//    /gambitboard remove                  — remove the billboard tag from the nearest armor stand (ops only)
+//    /gambitboard refresh                 — force-update the billboard now (ops only)
 // ============================================================
 
 var StringArgumentType = Java.loadClass('com.mojang.brigadier.arguments.StringArgumentType');
@@ -28,6 +32,8 @@ var ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS = 200;
 var STATS_FLUSH_INTERVAL_TICKS = 200;
 var PLAYERREVIVE_BLEEDING_KEY = 'playerrevive:bleeding';
 var STATS_FILE_PATH = 'kubejs/data/gambit_stats.json';
+var BILLBOARD_TAG = 'gambit_billboard';
+var BILLBOARD_UPDATE_INTERVAL_TICKS = 100;
 
 // ── In-memory stat store ─────────────────────────────────────
 var stats = {};
@@ -37,6 +43,7 @@ var recentDownedFinishers = {};
 var attackerCacheCleanupTicker = 0;
 var statsSaveTicker = 0;
 var statsDirty = false;
+var billboardUpdateTicker = 0;
 
 function makeDefaultEntry() {
   return { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
@@ -65,6 +72,36 @@ function normalizeEntry(raw) {
 
 function markStatsDirty() {
   statsDirty = true;
+}
+
+// ── Billboard helpers ────────────────────────────────────────
+function buildBillboardLines() {
+  var sorted = getSortedEntries();
+  var lines = [];
+  lines.push('{"text":"  Gambit Leaderboard  ","bold":true,"color":"gold"}');
+  var limit = Math.min(10, sorted.length);
+  for (var i = 0; i < limit; i++) {
+    var name = sorted[i][0];
+    var e = sorted[i][1];
+    lines.push('{"text":"' + (i + 1) + '. ' + name + '","color":"yellow"},{"text":" KD: ","color":"aqua"},{"text":"' + getKD(e).toFixed(2) + '","color":"white"},{"text":" DPL: ","color":"red"},{"text":"' + getAvgDamagePerLife(e).toFixed(0) + '","color":"white"}');
+  }
+  if (lines.length === 1) {
+    lines.push('{"text":"No stats yet","color":"gray"}');
+  }
+  return lines;
+}
+
+function updateBillboard(server) {
+  if (!server) return;
+  var lines = buildBillboardLines();
+  // CustomName uses JSON text; armor stands with the billboard tag get updated
+  for (var i = 0; i < lines.length && i < 1; i++) {
+    server.runCommandSilent('data merge entity @e[type=armor_stand,tag=' + BILLBOARD_TAG + ',limit=1] {CustomName:\'{"text":\"\"}\'  }');
+  }
+  // Build a single multi-line custom name using line-feed trick (\\n not supported;
+  // instead we stack lines into one JSON array component)
+  var nameJson = '[' + lines.join(',{"text":"\\n"},') + ']';
+  server.runCommandSilent('data merge entity @e[type=armor_stand,tag=' + BILLBOARD_TAG + '] {CustomName:\'' + nameJson + '\',CustomNameVisible:1b}');
 }
 
 function loadStatsFromDisk() {
@@ -644,14 +681,19 @@ PlayerEvents.loggedIn(function(event) {
 
 ServerEvents.tick(function(event) {
   attackerCacheCleanupTicker += 1;
-  if (attackerCacheCleanupTicker < ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS) return;
+  if (attackerCacheCleanupTicker >= ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS) {
+    attackerCacheCleanupTicker = 0;
+    cleanupExpiredAttackerCache();
+    statsSaveTicker += ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS;
+    if (statsDirty && statsSaveTicker >= STATS_FLUSH_INTERVAL_TICKS) {
+      saveStatsToDisk();
+    }
+  }
 
-  attackerCacheCleanupTicker = 0;
-  cleanupExpiredAttackerCache();
-
-  statsSaveTicker += ATTACKER_CACHE_CLEANUP_INTERVAL_TICKS;
-  if (statsDirty && statsSaveTicker >= STATS_FLUSH_INTERVAL_TICKS) {
-    saveStatsToDisk();
+  billboardUpdateTicker += 1;
+  if (billboardUpdateTicker >= BILLBOARD_UPDATE_INTERVAL_TICKS) {
+    billboardUpdateTicker = 0;
+    updateBillboard(event.server);
   }
 });
 
