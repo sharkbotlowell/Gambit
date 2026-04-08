@@ -13,5 +13,8 @@ scoreboard objectives remove tdm_kills
 scoreboard objectives remove tdm_deaths_counted
 scoreboard objectives remove gun_deaths
 scoreboard objectives remove gun_deaths_prev
+scoreboard objectives remove ration_roll
+scoreboard objectives remove pleft_ui_timer
+scoreboard objectives remove tdm_ui
 schedule clear gun:pleft/loop
 schedule clear gun:death/loop

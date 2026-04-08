@@ -1,9 +1,7 @@
 # Boilerplate TDM start for a new map.
 # Replace map_id and all coordinates before using this function live.
 
-function shark:teamrandom
-scoreboard players set #mode mode_id 1
-scoreboard players set #mode mode_respawns 1
+function gun:teams/randomize
 scoreboard players set #map map_id 99
 
 # Replace these with real map spawn coordinates.

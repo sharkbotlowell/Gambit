@@ -1,4 +1,4 @@
-function shark:teamrandom
+function gun:teams/randomize
 scoreboard players set #mode mode_id 0
 scoreboard players set #mode mode_respawns 0
 scoreboard players set #map map_id 3

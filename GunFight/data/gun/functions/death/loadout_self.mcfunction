@@ -10,4 +10,4 @@ item replace entity @s[gamemode=!creative,gamemode=!spectator] inventory.26 with
 item replace entity @s[gamemode=!creative,gamemode=!spectator] inventory.25 with tacz:ammo_box{AllTypeCreative:1b}
 function gun:kits/single/equip
 function gun:rations/give_random_self
-function shark:ugly/sharkgod
+function shark:sharkgod

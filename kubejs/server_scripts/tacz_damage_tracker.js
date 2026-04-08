@@ -14,8 +14,8 @@
 //    /gambitstats reset all               — reset all players' stats (ops only)
 //    /gambitstats reset                   — shows reset usage/help (ops only)
 //
-//    /gambitboard setup                   — tag the nearest armor stand as the billboard (ops only)
-//    /gambitboard remove                  — remove the billboard tag from the nearest armor stand (ops only)
+//    /gambitboard setup                   — spawn a text_display billboard at your feet (ops only)
+//    /gambitboard remove                  — kill the nearest billboard text_display (ops only)
 //    /gambitboard refresh                 — force-update the billboard now (ops only)
 // ============================================================
 
@@ -44,6 +44,11 @@ var attackerCacheCleanupTicker = 0;
 var statsSaveTicker = 0;
 var statsDirty = false;
 var billboardUpdateTicker = 0;
+
+// Load stats from disk immediately on script evaluation.
+// This runs on both server start AND /reload, ensuring offline players
+// are always present in the leaderboard after a script reload.
+loadStatsFromDisk();
 
 function makeDefaultEntry() {
   return { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
@@ -75,33 +80,23 @@ function markStatsDirty() {
 }
 
 // ── Billboard helpers ────────────────────────────────────────
-function buildBillboardLines() {
+function buildBillboardText() {
   var sorted = getSortedEntries();
-  var lines = [];
-  lines.push('{"text":"  Gambit Leaderboard  ","bold":true,"color":"gold"}');
+  var lines = ['== Gambit Leaderboard =='];
   var limit = Math.min(10, sorted.length);
   for (var i = 0; i < limit; i++) {
-    var name = sorted[i][0];
+    var name = sorted[i][0].replace(/\\/g, '').replace(/"/g, '').replace(/'/g, '');
     var e = sorted[i][1];
-    lines.push('{"text":"' + (i + 1) + '. ' + name + '","color":"yellow"},{"text":" KD: ","color":"aqua"},{"text":"' + getKD(e).toFixed(2) + '","color":"white"},{"text":" DPL: ","color":"red"},{"text":"' + getAvgDamagePerLife(e).toFixed(0) + '","color":"white"}');
+    lines.push((i + 1) + '. ' + name + '  KD:' + getKD(e).toFixed(2) + '  D/L:' + getAvgDamagePerLife(e).toFixed(0));
   }
-  if (lines.length === 1) {
-    lines.push('{"text":"No stats yet","color":"gray"}');
-  }
-  return lines;
+  if (limit === 0) lines.push('No stats yet');
+  return lines.join('\\n');
 }
 
 function updateBillboard(server) {
   if (!server) return;
-  var lines = buildBillboardLines();
-  // CustomName uses JSON text; armor stands with the billboard tag get updated
-  for (var i = 0; i < lines.length && i < 1; i++) {
-    server.runCommandSilent('data merge entity @e[type=armor_stand,tag=' + BILLBOARD_TAG + ',limit=1] {CustomName:\'{"text":\"\"}\'  }');
-  }
-  // Build a single multi-line custom name using line-feed trick (\\n not supported;
-  // instead we stack lines into one JSON array component)
-  var nameJson = '[' + lines.join(',{"text":"\\n"},') + ']';
-  server.runCommandSilent('data merge entity @e[type=armor_stand,tag=' + BILLBOARD_TAG + '] {CustomName:\'' + nameJson + '\',CustomNameVisible:1b}');
+  var text = buildBillboardText();
+  server.runCommandSilent('data merge entity @e[type=text_display,tag=' + BILLBOARD_TAG + '] {text:\'{"text":"' + text + '"}\'}');
 }
 
 function loadStatsFromDisk() {
@@ -1072,6 +1067,60 @@ ServerEvents.commandRegistry(function(event) {
             player.tell('  §dWin %: §f' + getWinPct(e).toFixed(1) + '%');
             player.tell('  §6MVPs: §f' + (e.mvps || 0));
             player.tell('§6§l──────────────────────');
+            return 1;
+          })
+      )
+  );
+});
+
+// ── /gambitboard command ──────────────────────────────────────
+ServerEvents.commandRegistry(function(event) {
+  var Commands = event.commands;
+
+  event.register(
+    Commands.literal('gambitboard')
+      .requires(function(src) { return src.hasPermission(2); })
+
+      // /gambitboard setup — spawn a text_display billboard at player position
+      .then(
+        Commands.literal('setup')
+          .executes(function(ctx) {
+            var player = ctx.source.player;
+            if (!player || !player.tell) return 1;
+            var x = player.x.toFixed(2);
+            var y = (player.y + 1).toFixed(2);
+            var z = player.z.toFixed(2);
+            ctx.source.server.runCommandSilent(
+              'summon minecraft:text_display ' + x + ' ' + y + ' ' + z +
+              ' {Tags:["' + BILLBOARD_TAG + '"],billboard:"center",background:0,line_width:300,text:\'{"text":"Loading..."}\'}'
+            );
+            player.tell('§a[Gambit Board] Billboard spawned. Updating...');
+            updateBillboard(ctx.source.server);
+            return 1;
+          })
+      )
+
+      // /gambitboard remove — kill nearest text_display billboard
+      .then(
+        Commands.literal('remove')
+          .executes(function(ctx) {
+            var player = ctx.source.player;
+            if (!player || !player.tell) return 1;
+            ctx.source.server.runCommandSilent(
+              'kill @e[type=text_display,tag=' + BILLBOARD_TAG + ',limit=1,sort=nearest,x=' + Math.floor(player.x) + ',y=' + Math.floor(player.y) + ',z=' + Math.floor(player.z) + ',distance=..20]'
+            );
+            player.tell('§a[Gambit Board] Nearest billboard removed.');
+            return 1;
+          })
+      )
+
+      // /gambitboard refresh — force update now
+      .then(
+        Commands.literal('refresh')
+          .executes(function(ctx) {
+            var player = ctx.source.player;
+            updateBillboard(ctx.source.server);
+            if (player && player.tell) player.tell('§a[Gambit Board] Billboard updated.');
             return 1;
           })
       )

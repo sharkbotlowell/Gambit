@@ -1,8 +1,8 @@
-function shark:ugly/ugly
+revive @a
 tp @a[tag=Red] -7.84 0.00 0.52 -1529.49 1.46
 tp @a[tag=Blue] 6.74 0.00 0.54 -1349.64 2.36
 gamerule doImmediateRespawn false
-execute as @a[gamemode=spectator] run function shark:spawntp
+execute as @a[gamemode=spectator] run execute in minecraft:overworld run tp @s 0.43 0.00 0.43 -1260.08 3.15
 execute at @a[gamemode=spectator] as @a[gamemode=spectator] run gamemode adventure
 tag @a remove gun_dead
 tag @a remove gun_just_died
