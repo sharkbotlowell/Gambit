@@ -13,6 +13,16 @@ scoreboard objectives add tdm_kills dummy "TDM Kills"
 scoreboard objectives add tdm_deaths_counted dummy
 scoreboard objectives add gun_deaths deathCount
 scoreboard objectives add gun_deaths_prev dummy
+scoreboard objectives add ration_roll dummy
+scoreboard objectives add pleft_ui_timer dummy
+scoreboard objectives add tdm_ui dummy
+scoreboard players set #ration_mod ration_roll 4
+scoreboard players set #ui pleft_ui_timer 0
+scoreboard players set #warn_gap tdm_ui 5
+scoreboard players set #RedWarn tdm_ui 0
+scoreboard players set #BlueWarn tdm_ui 0
+scoreboard players set #RedLeft tdm_ui 0
+scoreboard players set #BlueLeft tdm_ui 0
 scoreboard players set #mode mode_id 0
 scoreboard players set #mode mode_respawns 0
 scoreboard players set #map map_id 0
