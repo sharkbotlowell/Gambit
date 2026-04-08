@@ -96,7 +96,8 @@ function buildBillboardText() {
 function updateBillboard(server) {
   if (!server) return;
   var text = buildBillboardText();
-  server.runCommandSilent('data merge entity @e[type=text_display,tag=' + BILLBOARD_TAG + '] {text:\'{"text":"' + text + '"}\'}');
+  var textJson = '{"text":"' + text + '"}';
+  server.runCommandSilent('data modify entity @e[type=text_display,tag=' + BILLBOARD_TAG + '] text set value \'' + textJson + '\'');
 }
 
 function loadStatsFromDisk() {
