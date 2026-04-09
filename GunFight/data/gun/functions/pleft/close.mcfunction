@@ -6,7 +6,6 @@ scoreboard objectives remove mode_respawns
 scoreboard objectives remove map_id
 scoreboard objectives remove tdm_red_kills
 scoreboard objectives remove tdm_blue_kills
-scoreboard objectives remove tdm_kill_target
 scoreboard objectives remove tdm_respawn_timer
 scoreboard objectives remove spec_respawn_timer
 scoreboard objectives remove tdm_kills

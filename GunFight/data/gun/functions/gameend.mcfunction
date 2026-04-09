@@ -1,4 +1,8 @@
 revive @a
+# Force any players still in spectator (waiting to respawn mid-TDM) back to adventure
+# before the TP so they land correctly rather than staying stuck as spectators.
+gamemode adventure @a[tag=gun_dead,gamemode=spectator]
+scoreboard players set @a tdm_respawn_timer 0
 tp @a[tag=Red] -7.84 0.00 0.52 -1529.49 1.46
 tp @a[tag=Blue] 6.74 0.00 0.54 -1349.64 2.36
 gamerule doImmediateRespawn false
@@ -18,5 +22,6 @@ effect give @a saturation 1800 0 true
 team join lobby @a[team=red]
 team join lobby @a[team=blue]
 schedule clear gun:tdm/spawnpoints
+spawnpoint @a 0 0 0
 schedule function gun:selectors/loop 1t
 schedule function gun:pleft/close 1t

@@ -15,7 +15,8 @@
 //                    Broadcasts the new target to all players.
 //
 //   /setmap <preset> - Announce and stage the next map (OP only).
-//                    Presets: forest, forest2, trenches, tdm_forest
+//                    Presets: forest, forest2, trenches, tdm_forest,
+//                             training_grounds, tdm_training_grounds, tdm_mall
 //                    Displays persistently in the lobby actionbar.
 //
 // Notes:
@@ -111,6 +112,8 @@ function announceNextMap(server, mapId, modeId, modeName, mapName, modeColor, bo
 ServerEvents.loaded(function(event) {
   event.server.runCommandSilent('scoreboard objectives add nextmap_id dummy');
   event.server.runCommandSilent('scoreboard objectives add nextmap_mode dummy');
+  event.server.runCommandSilent('scoreboard objectives add tdm_kill_target dummy "Kill Target"');
+  event.server.runCommandSilent('execute unless score #target tdm_kill_target matches 1.. run scoreboard players set #target tdm_kill_target 50');
   event.server.runCommandSilent('bossbar add gun:nextmap {"text":""}');
   event.server.runCommandSilent('bossbar set gun:nextmap visible false');
   event.server.runCommandSilent('bossbar set gun:nextmap max 1');
@@ -171,6 +174,7 @@ ServerEvents.commandRegistry(function(event) {
         Commands.argument('kills', IntegerArgumentType.integer(1, 500))
           .executes(function(ctx) {
             var kills = IntegerArgumentType.getInteger(ctx, 'kills');
+            ctx.source.server.runCommandSilent('scoreboard objectives add tdm_kill_target dummy "Kill Target"');
             ctx.source.server.runCommandSilent('scoreboard players set #target tdm_kill_target ' + kills);
             ctx.source.server.runCommandSilent(
               'tellraw @a ["[Gambit] ",{"text":"TDM kill target set to ","color":"yellow"},{"text":"' + kills + '","color":"aqua"},{"text":" kills.","color":"yellow"}]'
@@ -201,6 +205,21 @@ ServerEvents.commandRegistry(function(event) {
       .then(Commands.literal('tdm_forest')
         .executes(function(ctx) {
           announceNextMap(ctx.source.server, 1, 1, 'TDM', 'Forest', 'aqua', 'blue');
+          return 1;
+        }))
+      .then(Commands.literal('training_grounds')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 4, 0, 'Elimination', 'Training Grounds', 'green', 'green');
+          return 1;
+        }))
+      .then(Commands.literal('tdm_training_grounds')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 4, 1, 'TDM', 'Training Grounds', 'aqua', 'blue');
+          return 1;
+        }))
+      .then(Commands.literal('tdm_mall')
+        .executes(function(ctx) {
+          announceNextMap(ctx.source.server, 5, 1, 'TDM', 'Mall', 'aqua', 'blue');
           return 1;
         }))
   );

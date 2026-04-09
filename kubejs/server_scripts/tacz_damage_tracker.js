@@ -34,21 +34,24 @@ var PLAYERREVIVE_BLEEDING_KEY = 'playerrevive:bleeding';
 var STATS_FILE_PATH = 'kubejs/data/gambit_stats.json';
 var BILLBOARD_TAG = 'gambit_billboard';
 var BILLBOARD_UPDATE_INTERVAL_TICKS = 100;
+var BILLBOARD_POS_FILE = 'kubejs/data/gambit_billboard_pos.json';
 
 // ── In-memory stat store ─────────────────────────────────────
 var stats = {};
 var roundStats = {};
 var recentPlayerAttackers = {};
-var recentDownedFinishers = {};
+var recentDownedFinishers = {}; 
 var attackerCacheCleanupTicker = 0;
 var statsSaveTicker = 0;
 var statsDirty = false;
 var billboardUpdateTicker = 0;
+var billboardPos = null; // {x, y, z} — persisted spawn position of the billboard entity
 
 // Load stats from disk immediately on script evaluation.
 // This runs on both server start AND /reload, ensuring offline players
 // are always present in the leaderboard after a script reload.
 loadStatsFromDisk();
+loadBillboardPos();
 
 function makeDefaultEntry() {
   return { damage: 0.0, kills: 0, deaths: 0, matches: 0, wins: 0, mvps: 0 };
@@ -80,6 +83,20 @@ function markStatsDirty() {
 }
 
 // ── Billboard helpers ────────────────────────────────────────
+function loadBillboardPos() {
+  try {
+    var pos = JsonIO.read(BILLBOARD_POS_FILE);
+    if (pos && typeof pos.x === 'number' && typeof pos.y === 'number' && typeof pos.z === 'number') {
+      billboardPos = {x: Math.floor(pos.x), y: Math.floor(pos.y), z: Math.floor(pos.z)};
+    }
+  } catch (e) {}
+}
+
+function saveBillboardPos(x, y, z) {
+  billboardPos = {x: x, y: y, z: z};
+  try { JsonIO.write(BILLBOARD_POS_FILE, billboardPos); } catch (e) {}
+}
+
 function buildBillboardText() {
   var sorted = getSortedEntries();
   var lines = ['== Gambit Leaderboard =='];
@@ -90,14 +107,18 @@ function buildBillboardText() {
     lines.push((i + 1) + '. ' + name + '  KD:' + getKD(e).toFixed(2) + '  D/L:' + getAvgDamagePerLife(e).toFixed(0));
   }
   if (limit === 0) lines.push('No stats yet');
-  return lines.join('\\n');
+  return lines.join('\\\\n');
 }
 
 function updateBillboard(server) {
   if (!server) return;
   var text = buildBillboardText();
   var textJson = '{"text":"' + text + '"}';
-  server.runCommandSilent('data modify entity @e[type=text_display,tag=' + BILLBOARD_TAG + '] text set value \'' + textJson + '\'');
+  // Wrap in 'execute in overworld' so @e has a world context on Forge 1.20.1.
+  // data modify from a bare server source may find no entities without it.
+  server.runCommandSilent(
+    'execute in minecraft:overworld run data modify entity @e[type=minecraft:text_display,tag=' + BILLBOARD_TAG + ',limit=1] text set value \'' + textJson + '\''
+  );
 }
 
 function loadStatsFromDisk() {
@@ -120,8 +141,24 @@ function loadStatsFromDisk() {
 
 function saveStatsToDisk() {
   try {
-    JsonIO.write(STATS_FILE_PATH, stats);
+    // Re-read the existing file and merge any entries that are on disk but not
+    // in memory before writing. This ensures a partial in-memory state (e.g.
+    // after a script reload before all players log back in) never silently
+    // drops persisted players from the JSON.
+    var existing = null;
+    try { existing = JsonIO.read(STATS_FILE_PATH); } catch (readErr) {}
+    if (existing) {
+      var diskKeys = Object.keys(existing);
+      for (var i = 0; i < diskKeys.length; i++) {
+        if (!stats[diskKeys[i]]) {
+          stats[diskKeys[i]] = normalizeEntry(existing[diskKeys[i]]);
+        }
+      }
+      // Keep a rolling backup of the last known-good file.
+      try { JsonIO.write(STATS_FILE_PATH + '.bak', existing); } catch (bakErr) {}
+    }
 
+    JsonIO.write(STATS_FILE_PATH, stats);
     statsDirty = false;
     statsSaveTicker = 0;
   } catch (e) {
@@ -655,7 +692,22 @@ function statsSize() {
 
 ServerEvents.loaded(function(event) {
   var loaded = loadStatsFromDisk();
-  loadOnlinePlayersIntoStats(event.server);
+  loadBillboardPos();
+  // Push authoritative disk stats to online players' NBT.
+  // Pulling FROM players here could overwrite clean JSON data with zeroed NBT
+  // (e.g. after a /reload that clears persistentData).
+  if (event.server && event.server.players) {
+    event.server.players.forEach(function(p) {
+      if (!p) return;
+      var name = p.name && p.name.string ? p.name.string : null;
+      if (!name) return;
+      if (stats[name]) {
+        saveEntryToPlayer(p);
+      } else {
+        loadEntryFromPlayer(p);
+      }
+    });
+  }
   if (loaded) {
     saveStatsToDisk();
   }
@@ -780,7 +832,6 @@ ServerEvents.commandRegistry(function(event) {
       .executes(function(ctx) {
         var player = ctx.source.player;
         if (!player || !player.tell) return 1;
-        loadOnlinePlayersIntoStats(ctx.source.server);
 
         if (statsSize() === 0) {
           player.tell('§7[Gambit Stats] No stats recorded yet for this round.');
@@ -841,7 +892,6 @@ ServerEvents.commandRegistry(function(event) {
                   return 1;
                 }
 
-                loadOnlinePlayersIntoStats(ctx.source.server);
                 if (statsSize() === 0) {
                   player.tell('§7[Gambit Stats] No stats recorded yet.');
                   return 1;
@@ -939,16 +989,14 @@ ServerEvents.commandRegistry(function(event) {
                 if (!viewer || !viewer.tell) return 1;
 
                 var targetInput = StringArgumentType.getString(ctx, 'playerName');
-                loadOnlinePlayersIntoStats(ctx.source.server);
 
-                var targetPlayer = getOnlinePlayerByName(ctx.source.server, targetInput);
-                if (targetPlayer) loadEntryFromPlayer(targetPlayer);
+                var target = getExistingStatName(targetInput);
+                if (!target) {
+                  var tp = getOnlinePlayerByName(ctx.source.server, targetInput);
+                  target = tp && tp.name && tp.name.string ? tp.name.string : null;
+                }
 
-                var target = targetPlayer && targetPlayer.name && targetPlayer.name.string
-                  ? targetPlayer.name.string
-                  : getExistingStatName(targetInput);
-
-                if (!stats[target]) {
+                if (!target || !stats[target]) {
                   viewer.tell('§c[Gambit Stats] No stats found for "' + targetInput + '".');
                   return 1;
                 }
@@ -1043,16 +1091,14 @@ ServerEvents.commandRegistry(function(event) {
             if (!player || !player.tell) return 1;
 
             var targetInput = StringArgumentType.getString(ctx, 'playerName');
-            loadOnlinePlayersIntoStats(ctx.source.server);
 
-            var targetPlayer = getOnlinePlayerByName(ctx.source.server, targetInput);
-            if (targetPlayer) loadEntryFromPlayer(targetPlayer);
+            var target = getExistingStatName(targetInput);
+            if (!target) {
+              var tp = getOnlinePlayerByName(ctx.source.server, targetInput);
+              target = tp && tp.name && tp.name.string ? tp.name.string : null;
+            }
 
-            var target = targetPlayer && targetPlayer.name && targetPlayer.name.string
-              ? targetPlayer.name.string
-              : getExistingStatName(targetInput);
-
-            if (!stats[target]) {
+            if (!target || !stats[target]) {
               player.tell('§c[Gambit Stats] No stats found for "' + targetInput + '".');
               return 1;
             }
@@ -1082,35 +1128,46 @@ ServerEvents.commandRegistry(function(event) {
     Commands.literal('gambitboard')
       .requires(function(src) { return src.hasPermission(2); })
 
-      // /gambitboard setup — spawn a text_display billboard at player position
+      // /gambitboard setup — store player position and spawn the billboard there
       .then(
         Commands.literal('setup')
           .executes(function(ctx) {
             var player = ctx.source.player;
             if (!player || !player.tell) return 1;
-            var x = player.x.toFixed(2);
-            var y = (player.y + 1).toFixed(2);
-            var z = player.z.toFixed(2);
+            var playerName = player.name && player.name.string ? player.name.string : null;
+            if (!playerName) return 1;
+            var x = Math.floor(player.x);
+            var y = Math.floor(player.y) + 1;
+            var z = Math.floor(player.z);
+            saveBillboardPos(x, y, z);
+            // Kill any previous billboard first.
+            ctx.source.server.runCommandSilent('execute in minecraft:overworld run kill @e[type=minecraft:text_display,tag=' + BILLBOARD_TAG + ']');
+            var text = buildBillboardText();
+            var textJson = '{"text":"' + text + '"}';
+            var nbt = '{Tags:["' + BILLBOARD_TAG + '"],billboard:"center",background:0,line_width:200,text:\'' + textJson + '\'}';
+            // Use 'in minecraft:overworld' explicitly — don't inherit player's current
+            // dimension via 'at @s', which would place the entity in the wrong world
+            // if the player is not in the overworld.
             ctx.source.server.runCommandSilent(
-              'summon minecraft:text_display ' + x + ' ' + y + ' ' + z +
-              ' {Tags:["' + BILLBOARD_TAG + '"],billboard:"center",background:0,line_width:300,text:\'{"text":"Loading..."}\'}'
+              'execute as ' + playerName + ' in minecraft:overworld run summon minecraft:text_display ' + x + ' ' + y + ' ' + z + ' ' + nbt
             );
-            player.tell('§a[Gambit Board] Billboard spawned. Updating...');
-            updateBillboard(ctx.source.server);
+            player.tell('§a[Gambit Board] Billboard placed at ' + x + ' ' + y + ' ' + z + '.');
             return 1;
           })
       )
 
-      // /gambitboard remove — kill nearest text_display billboard
+      // /gambitboard remove — clear stored position and kill all billboard entities
       .then(
         Commands.literal('remove')
           .executes(function(ctx) {
             var player = ctx.source.player;
             if (!player || !player.tell) return 1;
+            billboardPos = null;
+            try { JsonIO.write(BILLBOARD_POS_FILE, {}); } catch (e) {}
             ctx.source.server.runCommandSilent(
-              'kill @e[type=text_display,tag=' + BILLBOARD_TAG + ',limit=1,sort=nearest,x=' + Math.floor(player.x) + ',y=' + Math.floor(player.y) + ',z=' + Math.floor(player.z) + ',distance=..20]'
+              'execute in minecraft:overworld run kill @e[type=minecraft:text_display,tag=' + BILLBOARD_TAG + ']'
             );
-            player.tell('§a[Gambit Board] Nearest billboard removed.');
+            player.tell('§a[Gambit Board] Billboard removed.');
             return 1;
           })
       )

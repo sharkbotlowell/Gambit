@@ -10,3 +10,8 @@ execute if score #nextmap nextmap_id matches 3 unless score #nextmode nextmap_mo
 
 # TDM maps
 execute if score #nextmap nextmap_id matches 1 if score #nextmode nextmap_mode matches 1 run function gun:starts/tdm/foreststart
+execute if score #nextmap nextmap_id matches 4 if score #nextmode nextmap_mode matches 1 run function gun:starts/tdm/traininggroundsstart
+execute if score #nextmap nextmap_id matches 5 if score #nextmode nextmap_mode matches 1 run function gun:starts/tdm/mallstart
+
+# Elimination maps (continued)
+execute if score #nextmap nextmap_id matches 4 unless score #nextmode nextmap_mode matches 1 run function gun:starts/traininggroundsstart

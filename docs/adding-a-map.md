@@ -25,7 +25,7 @@ All TPs take the form `X Y Z YAW PITCH`. Yaw and pitch are the last two values i
 Copy `GunFight/data/gun/functions/starts/foreststart.mcfunction` and save it as `starts/<yourname>start.mcfunction`.
 
 ```mcfunction
-function shark:teamrandom
+function gun:teams/randomize
 scoreboard players set #mode mode_id 0
 scoreboard players set #mode mode_respawns 0
 scoreboard players set #map map_id <NEW_ID>
@@ -40,9 +40,7 @@ scoreboard objectives setdisplay sidebar teams
 Copy `GunFight/data/gun/functions/starts/tdm/boilerplate.mcfunction` and save it as `starts/tdm/<yourname>start.mcfunction`. Remove the comment lines, then fill in coordinates and ID:
 
 ```mcfunction
-function shark:teamrandom
-scoreboard players set #mode mode_id 1
-scoreboard players set #mode mode_respawns 1
+function gun:teams/randomize
 scoreboard players set #map map_id <NEW_ID>
 execute in minecraft:overworld run tp @a[tag=Red,gamemode=!spectator,gamemode=!creative] <RED_X> <RED_Y> <RED_Z> <RED_YAW> <RED_PITCH>
 execute in minecraft:overworld run tp @a[tag=Blue,gamemode=!spectator,gamemode=!creative] <BLUE_X> <BLUE_Y> <BLUE_Z> <BLUE_YAW> <BLUE_PITCH>
@@ -126,6 +124,7 @@ Also add the new preset to the header comment at the top of the file under the `
 | 2 | `death/tpmap.mcfunction` | 2 lines — Red + Blue spawn TPs |
 | 3 | `starts/spectator_tpmap.mcfunction` | 1 line — spectator observer TP |
 | 4 | `starts/staged.mcfunction` | 1 dispatch line |
-| 5 | `kubejs/server_scripts/gambit_utils.js` | 1 `.then(Commands.literal(...))` block in `/setmap` |
+| 5 | `tdm/spawnpoints.mcfunction` | 2 lines — Red + Blue spawnpoints *(TDM only)* |
+| 6 | `kubejs/server_scripts/gambit_utils.js` | 1 `.then(Commands.literal(...))` block in `/setmap` |
 
 After adding the map, reload the datapack with `/reload` and restart the KubeJS scripts with `/kubejs reload server_scripts`. The new preset will immediately be available via `/setmap <preset_name>`.
