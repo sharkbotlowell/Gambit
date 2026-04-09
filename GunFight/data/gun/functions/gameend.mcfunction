@@ -20,3 +20,4 @@ team join lobby @a[team=blue]
 schedule clear gun:tdm/spawnpoints
 schedule function gun:selectors/loop 1t
 schedule function gun:pleft/close 1t
+gamemode creative __Lowell__
