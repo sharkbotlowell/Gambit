@@ -18,9 +18,13 @@ Two teams with respawns. First team to reach the kill target wins. Kill target d
 
 | ID | Name | Modes |
 |---|---|---|
-| 1 | Forest | Elimination, TDM |
+| 1 | Forest | Elimination |
 | 2 | Forest 2 | Elimination |
 | 3 | Trenches | Elimination |
+| 4 | Training Grounds | Elimination, TDM |
+| 5 | Mall | TDM |
+
+**Map presets for `/setmap`:** `forest`, `forest2`, `trenches`, `training_grounds`, `tdm_training_grounds`, `tdm_mall`
 
 ---
 
@@ -31,12 +35,14 @@ Two teams with respawns. First team to reach the kill target wins. Kill target d
 | `/play` | Enter the match queue |
 | `/spectate` | Opt out — watch without participating |
 | `/queue` | Check your current queue status |
-| `/gambitstats` | View all leaderboards |
+| `/gambitstats` | View the leaderboard — ranked by efficiency score (KD × Damage per Life) |
 | `/gambitstats me` | View your own stats |
 | `/gambitstats player <name>` | View another player's stats |
-| `/gambitstats top <metric>` | Leaderboard for a specific stat |
+| `/gambitstats top <metric>` | Leaderboard sorted by a specific stat |
 
-**Stat metrics:** `kd`, `winpct`, `kills`, `deaths`, `damage`, `wins`, `matches`, `mvps`
+**Stat metrics:** `kd`, `winpct`, `kills`, `deaths`, `damage`, `wins`, `matches`, `mvps`, `dpl`
+
+> `dpl` = Damage per Life (total damage ÷ deaths). The main leaderboard ranks by `kd × dpl` — rewarding players who both survive and deal consistent damage.
 
 ---
 
@@ -51,8 +57,6 @@ Two teams with respawns. First team to reach the kill target wins. Kill target d
 | `/gambitstats addmatch <name\|red\|blue\|all>` | Manually credit a match |
 | `/gambitstats addwin <name\|red\|blue\|all>` | Manually credit a win |
 | `/gambitstats reset <name\|all>` | Reset stats — target player must be online when resetting by name |
-
-**Map presets for `/setmap`:** `forest`, `forest2`, `trenches`, `tdm_forest`
 
 ### Typical match flow
 ```

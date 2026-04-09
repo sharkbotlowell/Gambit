@@ -3,14 +3,14 @@
 //    /gambitstats me                      — show your stats (any player)
 //    /gambitstats player <playerName>     — inspect one player (any player)
 //    /gambitstats top <metric>            — show top players by metric (any player)
-//      metrics: kd, winpct, damage, kills, deaths, wins, matches, mvps
+//      metrics: kd, winpct, damage, kills, deaths, wins, matches, mvps, dpl
 //    /gambitstats postgame                — broadcast post-game top 5 kills, top 5 damage, and MVP (ops/functions)
 //    /gambitstats <playerName>            — inspect one player (ops only, legacy alias)
 //
 //    /gambitstats addmatch <player|red|blue|all> — add 1 match (ops only)
 //    /gambitstats addwin <player|red|blue|all>   — add 1 win (ops only)
 //
-//    /gambitstats reset <playerName>      — reset one player's stats (ops only, online)
+//    /gambitstats reset <playerName>      — reset one player's stats (ops only, offline-safe)
 //    /gambitstats reset all               — reset all players' stats (ops only)
 //    /gambitstats reset                   — shows reset usage/help (ops only)
 //
@@ -99,23 +99,41 @@ function saveBillboardPos(x, y, z) {
 
 function buildBillboardText() {
   var sorted = getSortedEntries();
-  var lines = ['== Gambit Leaderboard =='];
   var limit = Math.min(10, sorted.length);
-  for (var i = 0; i < limit; i++) {
-    var name = sorted[i][0].replace(/\\/g, '').replace(/"/g, '').replace(/'/g, '');
-    var e = sorted[i][1];
-    lines.push((i + 1) + '. ' + name + '  KD:' + getKD(e).toFixed(2) + '  D/L:' + getAvgDamagePerLife(e).toFixed(0));
+  // nl: JS '\\\\n' → command \\n → SNBT parser outputs \n → JSON parser → newline
+  var nl = '\\\\n';
+  var sep = ' \u2502 '; // │ — column divider between KD and D/L
+
+  var components = [];
+  components.push('{"text":"\u2550\u2550 Gambit Leaderboard \u2550\u2550' + nl + '","color":"aqua","bold":true}');
+
+  if (limit === 0) {
+    components.push('{"text":"No stats yet","color":"gray"}');
+  } else {
+    for (var i = 0; i < limit; i++) {
+      var name = sorted[i][0].replace(/\\/g, '').replace(/"/g, '').replace(/'/g, '');
+      var e = sorted[i][1];
+      var prefix, color;
+      if (i === 0)      { prefix = '\u2605 '; color = 'red'; }
+      else if (i === 1) { prefix = '\u2605 '; color = 'gold'; }
+      else if (i === 2) { prefix = '\u2605 '; color = 'yellow'; }
+      else              { prefix = (i + 1) + '. '; color = 'white'; }
+      var line = prefix + name + '  KD:' + getKD(e).toFixed(2) + sep + 'D/L:' + getAvgDamagePerLife(e).toFixed(0);
+      var suffix = i < limit - 1 ? nl : '';
+      components.push('{"text":"' + line + suffix + '","color":"' + color + '"}');
+    }
   }
-  if (limit === 0) lines.push('No stats yet');
-  return lines.join('\\\\n');
+
+  var total = statsSize();
+  components.push('{"text":"' + nl + '\u2500\u2500 ' + total + ' operators tracked \u2500\u2500","color":"dark_gray"}');
+
+  return '[' + components.join(',') + ']';
 }
 
 function updateBillboard(server) {
   if (!server) return;
-  var text = buildBillboardText();
-  var textJson = '{"text":"' + text + '"}';
+  var textJson = buildBillboardText();
   // Wrap in 'execute in overworld' so @e has a world context on Forge 1.20.1.
-  // data modify from a bare server source may find no entities without it.
   server.runCommandSilent(
     'execute in minecraft:overworld run data modify entity @e[type=minecraft:text_display,tag=' + BILLBOARD_TAG + ',limit=1] text set value \'' + textJson + '\''
   );
@@ -491,6 +509,7 @@ function metricLabel(metric) {
   if (metric === 'wins') return 'Wins';
   if (metric === 'matches') return 'Matches';
   if (metric === 'mvps') return 'MVPs';
+  if (metric === 'dpl') return 'Damage per Life';
   return null;
 }
 
@@ -504,6 +523,7 @@ function metricValue(e, metric) {
   if (metric === 'wins') return e.wins;
   if (metric === 'matches') return e.matches;
   if (metric === 'mvps') return e.mvps || 0;
+  if (metric === 'dpl') return getAvgDamagePerLife(e);
   return NaN;
 }
 
@@ -511,6 +531,7 @@ function formatMetricValue(value, metric) {
   if (metric === 'kd') return Number(value).toFixed(2);
   if (metric === 'winpct') return Number(value).toFixed(1) + '%';
   if (metric === 'damage') return Number(value).toFixed(1);
+  if (metric === 'dpl') return Number(value).toFixed(1);
   return String(Math.floor(Number(value)));
 }
 
@@ -888,7 +909,7 @@ ServerEvents.commandRegistry(function(event) {
                 var metric = String(StringArgumentType.getString(ctx, 'metric')).toLowerCase();
                 var label = metricLabel(metric);
                 if (!label) {
-                  player.tell('§e[Gambit Stats] Unknown metric "' + metric + '". Use: kd, winpct, damage, kills, deaths, wins, matches, mvps.');
+                  player.tell('§e[Gambit Stats] Unknown metric "' + metric + '". Use: kd, winpct, damage, kills, deaths, wins, matches, mvps, dpl.');
                   return 1;
                 }
 
@@ -1031,7 +1052,7 @@ ServerEvents.commandRegistry(function(event) {
 
                 var keys = Object.keys(stats);
                 for (var i = 0; i < keys.length; i++) {
-                  delete stats[keys[i]];
+                  stats[keys[i]] = makeDefaultEntry();
                 }
 
                 ctx.source.server.players.forEach(function(p) {
@@ -1053,23 +1074,31 @@ ServerEvents.commandRegistry(function(event) {
               .executes(function(ctx) {
                 var caller = ctx.source.player;
                 var targetInput = StringArgumentType.getString(ctx, 'playerName');
-                var targetPlayer = getOnlinePlayerByName(ctx.source.server, targetInput);
 
-                if (!targetPlayer) {
-                  if (caller && caller.tell) caller.tell('§c[Gambit Stats] Player "' + targetInput + '" must be online to reset stats.');
+                // Try online first so we can also clear their NBT.
+                var targetPlayer = getOnlinePlayerByName(ctx.source.server, targetInput);
+                if (targetPlayer) {
+                  clearEntryForPlayer(targetPlayer);
+                  saveStatsToDisk();
+                  if (caller && caller.tell) {
+                    caller.tell('§a[Gambit Stats] Reset stats for ' + targetPlayer.name.string + '.');
+                    if (caller.uuid !== targetPlayer.uuid) {
+                      targetPlayer.tell('§a[Gambit Stats] Your stats were reset by ' + caller.name.string + '.');
+                    }
+                  }
                   return 1;
                 }
 
-                clearEntryForPlayer(targetPlayer);
-                saveStatsToDisk();
-
-                if (caller && caller.tell) {
-                  caller.tell('§a[Gambit Stats] Reset stats for ' + targetPlayer.name.string + '.');
-                  if (caller.uuid !== targetPlayer.uuid) {
-                    targetPlayer.tell('§a[Gambit Stats] Your stats were reset by ' + caller.name.string + '.');
-                  }
+                // Offline fallback: zero the JSON entry directly.
+                var resolvedName = getExistingStatName(targetInput);
+                if (!resolvedName) {
+                  if (caller && caller.tell) caller.tell('§c[Gambit Stats] No stats found for "' + targetInput + '".');
+                  return 1;
                 }
 
+                stats[resolvedName] = makeDefaultEntry();
+                saveStatsToDisk();
+                if (caller && caller.tell) caller.tell('§a[Gambit Stats] Reset stats for ' + resolvedName + ' (offline).');
                 return 1;
               })
           )
@@ -1142,9 +1171,8 @@ ServerEvents.commandRegistry(function(event) {
             saveBillboardPos(x, y, z);
             // Kill any previous billboard first.
             ctx.source.server.runCommandSilent('execute in minecraft:overworld run kill @e[type=minecraft:text_display,tag=' + BILLBOARD_TAG + ']');
-            var text = buildBillboardText();
-            var textJson = '{"text":"' + text + '"}';
-            var nbt = '{Tags:["' + BILLBOARD_TAG + '"],billboard:"center",background:0,line_width:200,text:\'' + textJson + '\'}';
+            var textJson = buildBillboardText();
+            var nbt = '{Tags:["' + BILLBOARD_TAG + '"],billboard:"fixed",background:0,line_width:300,text:\'' + textJson + '\'}';
             // Use 'in minecraft:overworld' explicitly — don't inherit player's current
             // dimension via 'at @s', which would place the entity in the wrong world
             // if the player is not in the overworld.

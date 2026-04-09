@@ -1,7 +1,5 @@
 execute unless score #mode mode_respawns matches 1 run schedule clear gun:tdm/spawnpoints
 
-execute if score #mode mode_respawns matches 1 if score #map map_id matches 1 as @a[tag=Red,gamemode=!creative] run spawnpoint @s 304 38 -39
-execute if score #mode mode_respawns matches 1 if score #map map_id matches 1 as @a[tag=Blue,gamemode=!creative] run spawnpoint @s 308 34 157
 execute if score #mode mode_respawns matches 1 if score #map map_id matches 2 as @a[tag=Red,gamemode=!creative] run spawnpoint @s 1042 39 -110
 execute if score #mode mode_respawns matches 1 if score #map map_id matches 2 as @a[tag=Blue,gamemode=!creative] run spawnpoint @s 879 39 -274
 execute if score #mode mode_respawns matches 1 if score #map map_id matches 3 as @a[tag=Red,gamemode=!creative] run spawnpoint @s 110 15 -320

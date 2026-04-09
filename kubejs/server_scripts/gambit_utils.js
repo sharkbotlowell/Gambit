@@ -202,11 +202,6 @@ ServerEvents.commandRegistry(function(event) {
           announceNextMap(ctx.source.server, 3, 0, 'Elimination', 'Trenches', 'green', 'green');
           return 1;
         }))
-      .then(Commands.literal('tdm_forest')
-        .executes(function(ctx) {
-          announceNextMap(ctx.source.server, 1, 1, 'TDM', 'Forest', 'aqua', 'blue');
-          return 1;
-        }))
       .then(Commands.literal('training_grounds')
         .executes(function(ctx) {
           announceNextMap(ctx.source.server, 4, 0, 'Elimination', 'Training Grounds', 'green', 'green');

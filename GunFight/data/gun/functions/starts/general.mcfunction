@@ -17,4 +17,5 @@ function gun:countdown/start
 team join red @a[tag=Red,tag=!gun_optout]
 team join blue @a[tag=Blue,tag=!gun_optout]
 schedule clear gun:selectors/loop
+execute if score #mode mode_respawns matches 1 run schedule function gun:selectors/loop 1t
 schedule function gun:death/loop 1t
