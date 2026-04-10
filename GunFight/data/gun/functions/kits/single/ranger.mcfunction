@@ -1,4 +1,4 @@
-give @s[tag=ranger] tacz:modern_kinetic_gun{AttachmentGRIP:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:grip_rk0"}},AttachmentMUZZLE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:muzzle_silencer_knight_qd"}},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_acog_ta31"}},AttachmentSTOCK:{Count:0b,id:"minecraft:air"},GunCurrentAmmoCount:40,GunFireMode:"AUTO",GunId:"tacz:qbz_191",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Zephyr","italic":false}'}} 1
-give @s[tag=ranger] tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b} 1
-give @s[tag=ranger] marbledsfirstaid:panacea_pills{Damage:0} 1
-give @s[tag=ranger] marbledsfirstaid:panacea_pills{Damage:0} 1
+item replace entity @s[tag=ranger] hotbar.0 with tacz:modern_kinetic_gun{AttachmentGRIP:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:grip_rk0"}},AttachmentMUZZLE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:muzzle_silencer_knight_qd"}},AttachmentSCOPE:{Count:1b,id:"tacz:attachment",tag:{AttachmentId:"tacz:scope_acog_ta31"}},AttachmentSTOCK:{Count:0b,id:"minecraft:air"},GunCurrentAmmoCount:40,GunFireMode:"AUTO",GunId:"tacz:qbz_191",HasBulletInBarrel:1b,RepairCost:0,display:{Name:'{"text":"Zephyr","italic":false}'}}
+item replace entity @s[tag=ranger] hotbar.1 with tacz:modern_kinetic_gun{GunCurrentAmmoCount:7,GunFireMode:"SEMI",GunId:"tacz:m1911",HasBulletInBarrel:1b}
+item replace entity @s[tag=ranger] hotbar.2 with marbledsfirstaid:panacea_pills{Damage:0}
+item replace entity @s[tag=ranger] hotbar.3 with marbledsfirstaid:panacea_pills{Damage:0}

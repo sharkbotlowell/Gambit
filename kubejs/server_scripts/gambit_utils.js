@@ -102,7 +102,7 @@ function announceNextMap(server, mapId, modeId, modeName, mapName, modeColor, bo
   server.runCommandSilent('scoreboard players set #nextmap nextmap_id ' + mapId);
   server.runCommandSilent('scoreboard players set #nextmode nextmap_mode ' + modeId);
   server.runCommandSilent(
-    'bossbar set gun:nextmap name ["",{"text":"Next Map: ","color":"gold"},{"text":"' + modeName + '","color":"' + modeColor + '"},{"text":" \u2014 ' + mapName + '","color":"white"}]'
+    'bossbar set gun:nextmap name ["",{"text":"Destination: ","color":"gold"},{"text":"' + modeName + '","color":"' + modeColor + '"},{"text":" \u2014 ' + mapName + '","color":"white"}]'
   );
   server.runCommandSilent('bossbar set gun:nextmap color ' + bossbarColor);
   server.runCommandSilent('bossbar set gun:nextmap players @a');
